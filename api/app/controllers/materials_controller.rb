@@ -1,5 +1,6 @@
 class MaterialsController < ApplicationController
   before_action :authenticate_user!, only: %i[create update destroy]
+  before_action :maybe_authenticate, only: %i[index]
   before_action :set_material, only: %i[show update destroy]
   before_action :authorize_owner!, only: %i[update destroy]
 
@@ -30,7 +31,7 @@ class MaterialsController < ApplicationController
   def show
     # Allow if published or owned by requester
     if @material.status != 'publicado'
-      authenticate_user!
+      return unless authenticate_user!
       return render json: { error: 'Sem permissão' }, status: :forbidden unless @material.user_id == current_user.id
     end
     render json: @material
@@ -84,4 +85,3 @@ class MaterialsController < ApplicationController
     )
   end
 end
-
